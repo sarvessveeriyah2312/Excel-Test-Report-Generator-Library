@@ -1,4 +1,4 @@
-package com.slinfo.testing.report.model;
+package com.testgenerator.testing.report.model;
 
 import java.util.HashMap;
 import java.util.Map;

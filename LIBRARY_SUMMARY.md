@@ -9,7 +9,7 @@ Location: `C:\Users\Sarvess\Documents\TestReportGenerator-Library`
 ## What You Got
 
 ### ✅ A Complete Maven Library
-- **Group ID**: `com.slinfo.testing`
+- **Group ID**: `com.testgenerator.testing`
 - **Artifact ID**: `excel-test-report-generator`
 - **Version**: `1.0.0`
 - **Status**: ✅ Built and Installed
@@ -69,7 +69,7 @@ generate-sample-report.bat
 
 ```xml
 <dependency>
-    <groupId>com.slinfo.testing</groupId>
+    <groupId>com.testgenerator.testing</groupId>
     <artifactId>excel-test-report-generator</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -168,7 +168,7 @@ TestReportGenerator-Library/
 ├── src/
 │   └── main/
 │       └── java/
-│           └── com/slinfo/testing/report/
+│           └── com/testgenerator/testing/report/
 │               ├── ExcelTestReportGenerator.java  # Main generator
 │               └── model/
 │                   ├── TestSuite.java      # Test suite model
@@ -247,7 +247,7 @@ generate-sample-report.bat
 ```xml
 <!-- Add to pom.xml -->
 <dependency>
-    <groupId>com.slinfo.testing</groupId>
+    <groupId>com.testgenerator.testing</groupId>
     <artifactId>excel-test-report-generator</artifactId>
     <version>1.0.0</version>
 </dependency>

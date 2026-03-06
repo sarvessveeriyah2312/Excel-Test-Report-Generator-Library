@@ -1,7 +1,7 @@
-import com.slinfo.testing.report.ExcelTestReportGenerator;
-import com.slinfo.testing.report.model.TestCase;
-import com.slinfo.testing.report.model.TestStatus;
-import com.slinfo.testing.report.model.TestSuite;
+import com.testgenerator.testing.report.ExcelTestReportGenerator;
+import com.testgenerator.testing.report.model.TestCase;
+import com.testgenerator.testing.report.model.TestStatus;
+import com.testgenerator.testing.report.model.TestSuite;
 
 /**
  * Simple example demonstrating how to use the Excel Test Report Generator library.

@@ -1,4 +1,4 @@
-package com.slinfo.testing.report.model;
+package com.testgenerator.testing.report.model;
 
 /**
  * Enum representing the status of a test case.

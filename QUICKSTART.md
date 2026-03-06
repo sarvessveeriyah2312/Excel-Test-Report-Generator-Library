@@ -11,7 +11,7 @@ Your Excel Test Report Generator library has been successfully built and install
 
 The library has been installed to your local Maven repository at:
 ```
-~/.m2/repository/com/slinfo/testing/excel-test-report-generator/1.0.0/
+~/.m2/repository/com/testgenerator/testing/excel-test-report-generator/1.0.0/
 ```
 
 ---
@@ -24,7 +24,7 @@ Add this dependency to your project's `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.slinfo.testing</groupId>
+    <groupId>com.testgenerator.testing</groupId>
     <artifactId>excel-test-report-generator</artifactId>
     <version>1.0.0</version>
 </dependency>
@@ -33,8 +33,8 @@ Add this dependency to your project's `pom.xml`:
 Then use it in your code:
 
 ```java
-import com.slinfo.testing.report.*;
-import com.slinfo.testing.report.model.*;
+import com.testgenerator.testing.report.*;
+import com.testgenerator.testing.report.model.*;
 
 public class MyTest {
     public static void main(String[] args) throws Exception {
@@ -108,7 +108,7 @@ This will generate `My_Test_Report.xlsx` in the current directory.
 2. Add the dependency:
 ```xml
 <dependency>
-    <groupId>com.slinfo.testing</groupId>
+    <groupId>com.testgenerator.testing</groupId>
     <artifactId>excel-test-report-generator</artifactId>
     <version>1.0.0</version>
     <scope>test</scope>
@@ -222,7 +222,7 @@ System.out.println("Duration: " + duration);
 
 ## Troubleshooting
 
-### Issue: "Package com.slinfo.testing.report does not exist"
+### Issue: "Package com.testgenerator.testing.report does not exist"
 
 **Solution**: Make sure you've added the dependency to your pom.xml and run:
 ```bash

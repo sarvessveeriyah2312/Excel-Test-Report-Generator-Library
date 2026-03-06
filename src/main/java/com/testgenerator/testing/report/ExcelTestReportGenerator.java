@@ -1,8 +1,8 @@
-package com.slinfo.testing.report;
+package com.testgenerator.testing.report;
 
-import com.slinfo.testing.report.model.TestCase;
-import com.slinfo.testing.report.model.TestStatus;
-import com.slinfo.testing.report.model.TestSuite;
+import com.testgenerator.testing.report.model.TestCase;
+import com.testgenerator.testing.report.model.TestStatus;
+import com.testgenerator.testing.report.model.TestSuite;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
