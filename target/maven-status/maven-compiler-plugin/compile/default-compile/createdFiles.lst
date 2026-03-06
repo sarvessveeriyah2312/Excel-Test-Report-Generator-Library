@@ -1,0 +1,8 @@
+com\slinfo\testing\report\model\TestSuite$Builder.class
+com\slinfo\testing\report\ExcelTestReportGenerator$Builder.class
+com\slinfo\testing\report\model\TestSuite.class
+com\slinfo\testing\report\ExcelTestReportGenerator$1.class
+com\slinfo\testing\report\model\TestStatus.class
+com\slinfo\testing\report\ExcelTestReportGenerator.class
+com\slinfo\testing\report\model\TestCase$Builder.class
+com\slinfo\testing\report\model\TestCase.class
