@@ -1,66 +1,106 @@
-# Excel Test Report Generator Library
+# Excel Test Report Generator
 
-A professional Java library for generating beautiful Excel test reports from your automated tests (JUnit, TestNG, or custom test frameworks).
+A professional Java library for generating beautiful, color-coded Excel test reports from automated or manual test results. Works with JUnit 5, TestNG, or any custom test framework.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [API Reference](#api-reference)
+- [Advanced Usage](#advanced-usage)
+- [Report Structure](#report-structure)
+- [Project Structure](#project-structure)
+- [Building the Library](#building-the-library)
+- [Changelog](#changelog)
+- [Future Enhancements](#future-enhancements)
+
+---
 
 ## Features
 
-- ✅ **Beautiful Excel Reports** - Professional, color-coded reports with charts and statistics
-- ✅ **Framework Agnostic** - Works with JUnit, TestNG, or any custom test framework
-- ✅ **Easy to Use** - Simple fluent API with builder pattern
-- ✅ **Customizable** - Add custom fields, metadata, and styling
-- ✅ **Comprehensive** - Summary sheets, detailed test cases, pass/fail statistics
-- ✅ **Zero Dependencies** - Only requires Apache POI (included)
+- **Professional Excel Reports** — Color-coded summary and detailed test case sheets
+- **Framework Agnostic** — Works with JUnit 4/5, TestNG, or any custom test framework
+- **Fluent Builder API** — Clean, readable code with builder pattern throughout
+- **Flexible Output** — Choose which sheets to include, set custom output paths
+- **Rich Test Data** — Track test ID, category, duration, expected/actual results, error messages, stack traces
+- **Custom Fields** — Attach any key-value data to test cases and suites
+- **Auto Statistics** — Pass rate, counts by status, total duration, and category grouping calculated automatically
+
+---
+
+## Requirements
+
+- Java 11 or higher
+- Apache POI 5.4.1 (bundled — no extra setup needed)
+
+---
 
 ## Installation
 
-### Option 1: Install to Local Maven Repository
+### Option 1: Maven (Recommended)
+
+Install the library to your local Maven repository:
 
 ```bash
-cd TestReportGenerator-Library
+cd Excel-Test-Report-Generator-Library
 mvn clean install
 ```
 
-Then add to your project's `pom.xml`:
+Then add the dependency to your project's `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.slinfo.testing</groupId>
+    <groupId>com.testgenerator.testing</groupId>
     <artifactId>excel-test-report-generator</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
 
-### Option 2: Copy JAR to Your Project
+### Option 2: JAR File
+
+Copy the built JAR directly into your project:
 
 ```bash
 mvn clean package
-# Copy target/excel-test-report-generator-1.0.0.jar to your project's lib folder
+cp target/excel-test-report-generator-1.0.0.jar /your/project/lib/
 ```
+
+Compile and run with it on the classpath:
+
+```bash
+javac -cp "lib/*" YourTest.java
+java -cp "lib/*:." YourTest
+```
+
+---
 
 ## Quick Start
 
-### Basic Usage
-
 ```java
-import com.slinfo.testing.report.ExcelTestReportGenerator;
-import com.slinfo.testing.report.model.*;
+import com.testgenerator.testing.report.ExcelTestReportGenerator;
+import com.testgenerator.testing.report.model.*;
 
-// Create a test suite
+// 1. Create a test suite
 TestSuite suite = TestSuite.builder()
-    .suiteName("My Test Suite")
-    .projectName("My Project")
-    .tester("Your Name")
+    .suiteName("Login Module Tests")
+    .projectName("My Application")
+    .tester("Jane Doe")
     .environment("UAT")
     .build();
 
-// Add test cases
+// 2. Add test cases
 suite.getTestCases().add(
     TestCase.builder()
         .testId("TC001")
-        .testName("Test Login Functionality")
+        .testName("Valid user login")
+        .category("Authentication")
         .status(TestStatus.PASS)
-        .expectedResult("User logs in successfully")
-        .actualResult("Login successful")
+        .expectedResult("Dashboard is shown")
+        .actualResult("Dashboard loaded successfully")
         .durationMs(1500)
         .build()
 );
@@ -68,93 +108,195 @@ suite.getTestCases().add(
 suite.getTestCases().add(
     TestCase.builder()
         .testId("TC002")
-        .testName("Test Invalid Password")
+        .testName("Login with wrong password")
+        .category("Authentication")
         .status(TestStatus.FAIL)
         .expectedResult("Error message displayed")
-        .actualResult("Application crashed")
-        .errorMessage("NullPointerException at line 42")
+        .actualResult("Application crashed with NullPointerException")
+        .errorMessage("NullPointerException at AuthService.java:42")
         .durationMs(2300)
         .build()
 );
 
-// Generate report
-String reportPath = ExcelTestReportGenerator.builder()
+// 3. Generate the report
+String path = ExcelTestReportGenerator.builder()
     .testSuite(suite)
-    .outputFile("test-report.xlsx")
+    .outputFile("login-test-report.xlsx")
     .generate();
 
-System.out.println("Report generated: " + reportPath);
+System.out.println("Report saved to: " + path);
 ```
+
+---
+
+## API Reference
+
+### `TestSuite`
+
+Represents a collection of test cases and suite-level metadata.
+
+```java
+TestSuite suite = TestSuite.builder()
+    .suiteName("Suite Name")          // Defaults to "Test Suite" if not set
+    .projectName("Project Name")      // Optional
+    .description("Suite description") // Optional
+    .tester("Tester Name")            // Optional
+    .environment("UAT / PROD / DEV")  // Optional
+    .executionDate(LocalDateTime.now())// Optional — defaults to now
+    .addTestCase(testCase)            // Add a single TestCase
+    .addTestCases(listOfTestCases)    // Add multiple TestCases
+    .addMetadata("key", "value")      // Add custom suite-level metadata
+    .build();
+```
+
+**Statistics methods:**
+
+| Method | Returns | Description |
+|---|---|---|
+| `getTotalTests()` | `int` | Total number of test cases |
+| `getPassedTests()` | `int` | Count of PASS results |
+| `getFailedTests()` | `int` | Count of FAIL results |
+| `getErrorTests()` | `int` | Count of ERROR results |
+| `getSkippedTests()` | `int` | Count of SKIP results |
+| `getPassRate()` | `double` | Percentage of passed tests |
+| `getTotalDurationMs()` | `long` | Sum of all test durations in ms |
+| `getTotalDurationFormatted()` | `String` | Human-readable duration (e.g. `"2m 30s"`) |
+| `getTestsByCategory()` | `Map<String, Long>` | Test count grouped by category |
+
+---
+
+### `TestCase`
+
+Represents a single test case with its result and metadata.
+
+```java
+TestCase testCase = TestCase.builder()
+    .testId("TC001")                       // Optional: unique identifier
+    .testName("Test name")                 // Required
+    .description("What this test checks")  // Optional
+    .category("API / UI / Database")       // Optional
+    .status(TestStatus.PASS)               // Optional — defaults to PENDING
+    .expectedResult("Expected behaviour")  // Optional
+    .actualResult("What actually happened")// Optional
+    .errorMessage("Error details")         // Optional
+    .stackTrace("Full stack trace")        // Optional
+    .durationMs(1500)                      // Optional: duration in milliseconds
+    .addCustomField("Key", "Value")        // Optional: any extra data
+    .build();
+```
+
+**Helper method:**
+
+| Method | Example Output |
+|---|---|
+| `getDurationFormatted()` | `"500ms"`, `"1.50s"`, `"1m 30s"` |
+
+---
+
+### `TestStatus`
+
+```java
+TestStatus.PASS     // Test passed
+TestStatus.FAIL     // Test failed (assertion failure)
+TestStatus.ERROR    // Test errored (unexpected exception)
+TestStatus.SKIP     // Test was skipped
+TestStatus.PENDING  // Test not yet executed
+```
+
+---
+
+### `ExcelTestReportGenerator`
+
+```java
+String reportPath = ExcelTestReportGenerator.builder()
+    .testSuite(suite)              // Required
+    .outputFile("report.xlsx")     // Optional — defaults to "test-report.xlsx"
+    .includeSummary(true)          // Optional — defaults to true
+    .includeDetailedTests(true)    // Optional — defaults to true
+    .generate();                   // Builds and writes the file, returns the path
+```
+
+- Throws `IllegalStateException` if `testSuite` is not set
+- Throws `IOException` if the file cannot be written
+
+---
 
 ## Advanced Usage
 
-### Using with JUnit 5
+### JUnit 5 Integration
+
+Implement `TestExecutionListener` to collect results automatically:
 
 ```java
-import org.junit.platform.launcher.*;
+import org.junit.platform.launcher.TestExecutionListener;
+import org.junit.platform.launcher.TestIdentifier;
 import org.junit.platform.engine.TestExecutionResult;
-import com.slinfo.testing.report.model.*;
+import com.testgenerator.testing.report.ExcelTestReportGenerator;
+import com.testgenerator.testing.report.model.*;
 
-public class JUnitReportGenerator implements TestExecutionListener {
+public class ExcelReportListener implements TestExecutionListener {
 
-    private TestSuite testSuite;
-    private Map<TestIdentifier, Long> startTimes = new HashMap<>();
+    private final TestSuite suite = TestSuite.builder()
+        .suiteName("JUnit Test Execution")
+        .projectName("My Application")
+        .build();
 
-    public JUnitReportGenerator() {
-        testSuite = TestSuite.builder()
-            .suiteName("JUnit Test Execution")
-            .projectName("My Application")
-            .build();
+    private final Map<TestIdentifier, Long> startTimes = new HashMap<>();
+
+    @Override
+    public void executionStarted(TestIdentifier id) {
+        if (id.isTest()) startTimes.put(id, System.currentTimeMillis());
     }
 
     @Override
-    public void executionStarted(TestIdentifier testIdentifier) {
-        if (testIdentifier.isTest()) {
-            startTimes.put(testIdentifier, System.currentTimeMillis());
-        }
-    }
+    public void executionFinished(TestIdentifier id, TestExecutionResult result) {
+        if (!id.isTest()) return;
 
-    @Override
-    public void executionFinished(TestIdentifier testIdentifier,
-                                 TestExecutionResult result) {
-        if (!testIdentifier.isTest()) return;
-
-        long duration = System.currentTimeMillis() -
-                       startTimes.get(testIdentifier);
-
+        long duration = System.currentTimeMillis() - startTimes.get(id);
         TestStatus status = result.getStatus() == TestExecutionResult.Status.SUCCESSFUL
-            ? TestStatus.PASS
-            : TestStatus.FAIL;
+            ? TestStatus.PASS : TestStatus.FAIL;
 
-        TestCase testCase = TestCase.builder()
-            .testName(testIdentifier.getDisplayName())
+        TestCase.Builder builder = TestCase.builder()
+            .testName(id.getDisplayName())
             .status(status)
-            .durationMs(duration)
-            .build();
+            .durationMs(duration);
 
-        if (result.getThrowable().isPresent()) {
-            Throwable ex = result.getThrowable().get();
-            testCase.setErrorMessage(ex.getMessage());
-            testCase.setStackTrace(getStackTrace(ex));
-        }
+        result.getThrowable().ifPresent(ex -> {
+            builder.errorMessage(ex.getMessage());
+            builder.stackTrace(stackTraceToString(ex));
+        });
 
-        testSuite.getTestCases().add(testCase);
+        suite.getTestCases().add(builder.build());
     }
 
-    public void generateReport(String filename) throws IOException {
-        ExcelTestReportGenerator.builder()
-            .testSuite(testSuite)
-            .outputFile(filename)
-            .generate();
+    @Override
+    public void testPlanExecutionFinished(TestPlan testPlan) {
+        try {
+            ExcelTestReportGenerator.builder()
+                .testSuite(suite)
+                .outputFile("junit-report.xlsx")
+                .generate();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 ```
 
+Register it in `src/test/resources/META-INF/services/org.junit.platform.launcher.TestExecutionListener`:
+```
+com.yourpackage.ExcelReportListener
+```
+
+---
+
 ### Custom Fields and Metadata
+
+Attach any additional data to test cases or the suite:
 
 ```java
 TestCase testCase = TestCase.builder()
-    .testName("SQL Batching Test")
+    .testName("Batch Query Performance")
     .status(TestStatus.PASS)
     .addCustomField("Database", "SQL Server 2019")
     .addCustomField("Total Parameters", "62,285")
@@ -165,143 +307,101 @@ TestCase testCase = TestCase.builder()
 TestSuite suite = TestSuite.builder()
     .suiteName("Performance Tests")
     .addMetadata("Server", "UAT-SERVER-01")
-    .addMetadata("Database Version", "15.0.4312")
-    .addMetadata("Test Framework", "JUnit 5.10")
+    .addMetadata("DB Version", "15.0.4312")
     .addTestCase(testCase)
     .build();
 ```
 
-### Categories and Grouping
+---
+
+### Selective Sheet Generation
 
 ```java
-// Create tests with categories
-TestCase apiTest = TestCase.builder()
-    .testName("Test API Endpoint")
-    .category("API Tests")
-    .status(TestStatus.PASS)
-    .build();
+// Summary sheet only
+ExcelTestReportGenerator.builder()
+    .testSuite(suite)
+    .outputFile("summary-only.xlsx")
+    .includeSummary(true)
+    .includeDetailedTests(false)
+    .generate();
 
-TestCase dbTest = TestCase.builder()
-    .testName("Test Database Connection")
-    .category("Database Tests")
-    .status(TestStatus.PASS)
-    .build();
+// Test cases sheet only
+ExcelTestReportGenerator.builder()
+    .testSuite(suite)
+    .outputFile("cases-only.xlsx")
+    .includeSummary(false)
+    .includeDetailedTests(true)
+    .generate();
+```
 
-TestCase uiTest = TestCase.builder()
-    .testName("Test Login UI")
-    .category("UI Tests")
-    .status(TestStatus.FAIL)
-    .build();
+---
 
+### Category Grouping
+
+```java
 TestSuite suite = TestSuite.builder()
     .suiteName("Integration Tests")
-    .addTestCase(apiTest)
-    .addTestCase(dbTest)
-    .addTestCase(uiTest)
+    .addTestCase(TestCase.builder().testName("API health check").category("API").status(TestStatus.PASS).build())
+    .addTestCase(TestCase.builder().testName("DB connection").category("Database").status(TestStatus.PASS).build())
+    .addTestCase(TestCase.builder().testName("Login UI").category("UI").status(TestStatus.FAIL).build())
     .build();
 
-// Get statistics by category
 Map<String, Long> byCategory = suite.getTestsByCategory();
-// Returns: {"API Tests": 1, "Database Tests": 1, "UI Tests": 1}
+// {"API": 1, "Database": 1, "UI": 1}
 ```
+
+---
 
 ## Report Structure
 
-The generated Excel file contains multiple sheets:
+The generated `.xlsx` file contains up to two sheets:
 
-### 1. Test Summary Sheet
-- Project information (name, tester, environment, date)
-- Overall statistics (total, passed, failed, errors, skipped)
-- Pass rate percentage
+### Sheet 1 — Test Summary
+- Project name, suite name, tester, environment, execution date
+- Test statistics table: total, passed, failed, errors, skipped
+- Pass rate with color indicator (green ≥ 90%, neutral 70–89%, red < 70%)
 - Total execution duration
-- Color-coded status indicators
 
-### 2. Test Cases Sheet
-- Detailed list of all test cases
-- Test ID, Name, Category, Status, Duration
-- Expected vs Actual results
-- Error messages and stack traces (if applicable)
-- Custom fields
+### Sheet 2 — Test Cases
+| Column | Description |
+|---|---|
+| Test ID | Unique identifier |
+| Test Name | Name of the test |
+| Category | Grouping label |
+| Status | PASS / FAIL / ERROR / SKIP / PENDING with color |
+| Duration | Formatted execution time |
+| Expected | Expected result |
+| Actual | Actual result |
 
-## API Reference
+**Status colors:**
+- PASS — Green
+- FAIL / ERROR — Red/Orange
+- SKIP / PENDING — Neutral
 
-### TestSuite
+---
 
-```java
-TestSuite suite = TestSuite.builder()
-    .suiteName(String)           // Required: Name of the test suite
-    .projectName(String)         // Optional: Project name
-    .description(String)         // Optional: Suite description
-    .tester(String)              // Optional: Tester name
-    .environment(String)         // Optional: Test environment (UAT, PROD, etc.)
-    .executionDate(LocalDateTime)// Optional: Execution date (defaults to now)
-    .addTestCase(TestCase)       // Add individual test case
-    .addTestCases(List<TestCase>)// Add multiple test cases
-    .addMetadata(String, String) // Add custom metadata
-    .build();
+## Project Structure
 
-// Statistics methods
-int getTotalTests();
-int getPassedTests();
-int getFailedTests();
-int getErrorTests();
-int getSkippedTests();
-double getPassRate();
-long getTotalDurationMs();
-String getTotalDurationFormatted();
-Map<String, Long> getTestsByCategory();
+```
+Excel-Test-Report-Generator-Library/
+├── pom.xml
+├── README.md
+├── QUICKSTART.md
+├── LIBRARY_SUMMARY.md
+├── examples/
+│   └── SimpleExample.java
+└── src/
+    └── main/
+        └── java/
+            └── com/testgenerator/testing/report/
+                ├── ExcelTestReportGenerator.java
+                └── model/
+                    ├── TestSuite.java
+                    ├── TestCase.java
+                    └── TestStatus.java
 ```
 
-### TestCase
-
-```java
-TestCase testCase = TestCase.builder()
-    .testId(String)              // Optional: Unique test ID
-    .testName(String)            // Required: Test name
-    .description(String)         // Optional: Test description
-    .category(String)            // Optional: Test category
-    .status(TestStatus)          // Optional: PASS, FAIL, ERROR, SKIP, PENDING
-    .expectedResult(String)      // Optional: Expected result
-    .actualResult(String)        // Optional: Actual result
-    .errorMessage(String)        // Optional: Error message
-    .stackTrace(String)          // Optional: Stack trace
-    .durationMs(long)            // Optional: Duration in milliseconds
-    .addCustomField(String, String) // Add custom field
-    .build();
-
-// Helper methods
-String getDurationFormatted();   // Returns formatted duration (e.g., "1.5s", "2m 30s")
-```
-
-### ExcelTestReportGenerator
-
-```java
-String reportPath = ExcelTestReportGenerator.builder()
-    .testSuite(TestSuite)        // Required: Test suite to report
-    .outputFile(String)          // Optional: Output filename (default: "test-report.xlsx")
-    .includeSummary(boolean)     // Optional: Include summary sheet (default: true)
-    .includeDetailedTests(boolean) // Optional: Include detailed tests (default: true)
-    .includeCharts(boolean)      // Optional: Include charts (default: false, future feature)
-    .generate();                 // Generate and return file path
-```
-
-## Test Status Values
-
-```java
-TestStatus.PASS    // Test passed
-TestStatus.FAIL    // Test failed (assertion error)
-TestStatus.ERROR   // Test error (exception)
-TestStatus.SKIP    // Test skipped
-TestStatus.PENDING // Test pending execution
-```
-
-## Examples
-
-See the `examples/` directory for more usage examples:
-- `SimpleExample.java` - Basic usage
-- `JUnitIntegrationExample.java` - JUnit 5 integration
-- `CustomFieldsExample.java` - Using custom fields and metadata
-- `BulkTestExample.java` - Generating reports for large test suites
+---
 
 ## Building the Library
 
@@ -312,56 +412,40 @@ mvn clean compile
 # Run tests
 mvn test
 
-# Package (creates JAR)
+# Package (creates JAR in target/)
 mvn clean package
 
 # Install to local Maven repository
 mvn clean install
 
-# Generate sources and javadoc JARs
+# Generate sources + javadoc JARs
 mvn clean package source:jar javadoc:jar
 ```
 
-## Requirements
-
-- Java 11 or higher
-- Apache POI 5.4.1 (included)
-- No other dependencies required
-
-## License
-
-This library is free to use for personal and commercial projects.
-
-## Contributing
-
-Feel free to submit issues, feature requests, or pull requests!
-
-## Support
-
-For questions or issues, please create an issue in the repository or contact: sarvess@slinfo.com
+---
 
 ## Changelog
 
-### Version 1.0.0 (2026-03-06)
+### v1.0.0 — 2026-03-06
 - Initial release
-- Summary and detailed test sheets
-- Support for JUnit, TestNG, and custom frameworks
-- Customizable fields and metadata
-- Professional Excel styling
-- Statistics and pass rate calculations
+- Summary and detailed test case sheets
+- Support for JUnit 4/5, TestNG, and custom frameworks
+- Custom fields and suite metadata
+- Professional Excel styling with color coding
+- Auto-calculated statistics and pass rate
+
+---
 
 ## Future Enhancements
 
-- Charts and graphs (pie charts, bar charts)
+- Charts (pie chart for pass/fail, bar chart by category)
 - PDF export
 - HTML report generation
 - TestNG listener integration
 - Screenshot attachments
-- Test execution trends over time
+- Test trend tracking across runs
 - Email report delivery
 
 ---
 
-**Made with ❤️ for better test reporting**
-#   E x c e l - T e s t - R e p o r t - G e n e r a t o r - L i b r a r y  
- 
+**Made with care for better test reporting.**
